@@ -222,10 +222,10 @@ void MacrosOnTheFly::addToPressedKeys(Key key, Key* pressedKeys) {
   //   impossible - we can't have two D events for the same key without a U
   //   event in between.
   for(uint8_t i = 0; i < MAX_SIMULTANEOUS_HELD_KEYS; i++) {
-    if(pressedKeys[i].raw == Key_NoKey.raw) {
-      pressedKeys[i].raw = key.raw;
+    if(pressedKeys[i].getRaw() == Key_NoKey.getRaw) {
+      pressedKeys[i].setRaw(key.getRaw());
       i++;
-      if(i < MAX_SIMULTANEOUS_HELD_KEYS) pressedKeys[i].raw = Key_NoKey.raw;
+      if(i < MAX_SIMULTANEOUS_HELD_KEYS) pressedKeys[i].setRaw(Key_NoKey.getRaw());
       break;
     }
   }
@@ -239,11 +239,11 @@ void MacrosOnTheFly::addToPressedKeys(Key key, Key* pressedKeys) {
 void MacrosOnTheFly::removeFromPressedKeys(Key key, Key* pressedKeys) {
   bool copying = false;
   for(uint8_t i = 0; i < MAX_SIMULTANEOUS_HELD_KEYS; i++) {
-    if(copying) pressedKeys[i].raw = pressedKeys[i+1].raw;
-    if(pressedKeys[i].raw == Key_NoKey.raw) break;
-    if(pressedKeys[i].raw == key.raw) {
+    if(copying) pressedKeys[i].setRaw(pressedKeys[i+1].getRaw());
+    if(pressedKeys[i].getRaw() == Key_NoKey.getRaw()) break;
+    if(pressedKeys[i].getRaw() == key.getRaw()) {
       copying = true;
-      pressedKeys[i].raw = pressedKeys[i+1].raw;
+      pressedKeys[i].setRaw(pressedKeys[i+1].getRaw());
     }
   }
 }
@@ -251,22 +251,22 @@ void MacrosOnTheFly::removeFromPressedKeys(Key key, Key* pressedKeys) {
 void MacrosOnTheFly::pressPressedKeys(Key* pressedKeys) {
   for(uint8_t i = 0; i < MAX_SIMULTANEOUS_HELD_KEYS; i++) {
     Key key = pressedKeys[i];
-    if(key.raw == Key_NoKey.raw) break;
+    if(key.getRaw() == Key_NoKey.getRaw()) break;
     handleKeyswitchEvent(key, UNKNOWN_KEYSWITCH_LOCATION, IS_PRESSED | WAS_PRESSED);
       // IS_PRESSED | WAS_PRESSED indicates "still held"
   }
 }
 
 void MacrosOnTheFly::clearPressedKeys(Key* pressedKeys) {
-  pressedKeys[0].raw = Key_NoKey.raw;
+  pressedKeys[0].setRaw Key_NoKey.getRaw());
 }
 
 // Returns TRUE for modifier or layer keys
 // This is (at least at the time of this writing) the same detection logic as
 //   used by Kaleidoscope-LED-ActiveModColor
 static bool isModifier(Key key) {
-  return (key.raw >= Key_LeftControl.raw && key.raw <= Key_RightGui.raw) ||
-    (key.flags == (SYNTHETIC | SWITCH_TO_KEYMAP));
+  return (key.getRaw() >= Key_LeftControl.getRaw() && key.getRaw() <= Key_RightGui.getRaw()) ||
+    (key.getFlags() == (SYNTHETIC | SWITCH_TO_KEYMAP));
 }
 
 // Adds flags to the 'flags' field of the key according to what is currently held
@@ -331,7 +331,7 @@ kaleidoscope::EventHandlerResult MacrosOnTheFly::onKeyswitchEvent(Key &mapped_ke
       //   it could be used to modify the slot-choice key
       return kaleidoscope::EventHandlerResult::OK;
     }
-    if(mapped_key.raw == MACROPLAY) {
+    if(mapped_key.getRaw() == MACROPLAY) {
       if(colorEffects) LED_record_fail(row, col);  // Trying to record into the PLAY slot is error
     } else {
       addModifierFlags(&mapped_key);
@@ -349,7 +349,7 @@ kaleidoscope::EventHandlerResult MacrosOnTheFly::onKeyswitchEvent(Key &mapped_ke
     return kaleidoscope::EventHandlerResult::EVENT_CONSUMED;
   }
 
-  if(currentState == IDLE && mapped_key.raw == MACROREC) {
+  if(currentState == IDLE && mapped_key.getRaw() == MACROREC) {
     if(keyToggledOn(key_state) && !isInjected) {
       // we only take action on ToggledOn events; and we don't enter recording mode
       //   during playback (see notes on injected keys at the top of this function)
@@ -392,7 +392,7 @@ kaleidoscope::EventHandlerResult MacrosOnTheFly::onKeyswitchEvent(Key &mapped_ke
     currentState = IDLE;  // do this first, so keypresses injected by playing the macro get handled with currentState==IDLE
     playing = true;
     bool success;
-    if(mapped_key.raw == MACROPLAY) {
+    if(mapped_key.getRaw() == MACROPLAY) {
       success = play(lastPlayedSlot);
     } else {
       int16_t index = findSlot(mapped_key);
@@ -412,7 +412,7 @@ kaleidoscope::EventHandlerResult MacrosOnTheFly::onKeyswitchEvent(Key &mapped_ke
   }
 
   // If we reach this point, we know the currentState must be IDLE
-  if(mapped_key.raw == MACROPLAY) {
+  if(mapped_key.getRaw() == MACROPLAY) {
     if(keyToggledOn(key_state)) {  // we only take action on ToggledOn events
       play_row = row;
       play_col = col;

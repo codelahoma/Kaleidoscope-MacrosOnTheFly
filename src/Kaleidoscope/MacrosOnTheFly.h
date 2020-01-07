@@ -24,8 +24,8 @@
 
 #define MACROREC kaleidoscope::ranges::KALEIDOSCOPE_SAFE_START
 #define MACROPLAY kaleidoscope::ranges::KALEIDOSCOPE_SAFE_START + 1
-#define Key_MacroRec  (Key) {.raw = MACROREC}
-#define Key_MacroPlay (Key) {.raw = MACROPLAY}
+#define Key_MacroRec  (Key) {.setRaw(MACROREC)}
+#define Key_MacroPlay (Key) {.setRaw(MACROPLAY)}
 
 namespace kaleidoscope {
 
